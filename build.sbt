@@ -11,5 +11,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-slick-evolutions" % "1.1.0",
   "com.github.t3hnar" %% "scala-bcrypt" % "3.0",
   "mysql" % "mysql-connector-java" % "5.1.34",
-  "com.pauldijou" %% "jwt-play-json" % "0.12.1"
+  "com.pauldijou" %% "jwt-play-json" % "0.12.1",
+  "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0" % "test",
+  "org.mockito" % "mockito-all" % "1.9.5" % "test"
 )

@@ -9,20 +9,22 @@ import slick.driver.MySQLDriver.api._
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.{Failure, Success, Try}
 
-import scala.util.Try
 
 @Singleton
 class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[JdbcProfile] {
-  def findByUsername(userName: String): Future[Try[(User, String)]]= {
-    db.run(sql"select id, username, pwd from Users where username = ${userName}".as[(Int, String, String)])
-      .map(results => Try((User(results.head._1, results.head._2), results.head._3)))
+
+  def findByUsername(userName: String): Future[Option[(User, String)]]= {
+    db.run(sql"select id, username, pwd from users where username = ${userName}".as[(Int, String, String)])
+      .map {
+        case results if(results.size == 1)=> Some((User(results.head._1, results.head._2), results.head._3))
+        case _ => None
+      }
 
   }
 
-
-  def insert(userName: String, password: String): Future[Int] =
-    db.run(sqlu"insert into Users(username, pwd) values (${userName}, ${password})")
-
+  def insert(userName: String, password: String): Future[Try[Int]] =
+    db.run(sqlu"insert into users(username, pwd) values (${userName}, ${password})".asTry)
 }
