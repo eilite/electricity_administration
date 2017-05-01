@@ -1,0 +1,3 @@
+package exceptions
+
+class TooLargeAmountException extends RuntimeException

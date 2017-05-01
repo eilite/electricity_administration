@@ -69,7 +69,7 @@ class PowerStationControllerTest extends PlaySpec with BeforeAndAfter with Scala
 
       "return user's powerstations" in {
         val request: Request[Unit] = new FakeRequest[Unit]("GET","/powerstations", FakeHeaders(Seq(("Authorization", token))), Nil)
-        when(powerStationDao.getPowerStations(userId)).thenReturn(Future.successful(Seq(PowerStation(13, "windturbine", 12234))))
+        when(powerStationDao.getPowerStations(userId)).thenReturn(Future.successful(Seq(PowerStation(13, "windturbine", 12234, 12))))
 
         val result:Future[Result] = fixture.getPowerStations.apply(request)
         assert(status(result)==200)
@@ -103,7 +103,7 @@ class PowerStationControllerTest extends PlaySpec with BeforeAndAfter with Scala
       "return powerstation for happy case" in {
         val jsonBody =Json.obj(("powerStationType", "windmill"),("capacity", 12000))
         val request: Request[JsValue] = new FakeRequest[JsValue]("POST","/powerstations", FakeHeaders(Seq(("Authorization", token))), jsonBody)
-        when(powerStationService.createPowerStation(CreatePowerStation("windmill", 12000), userId)).thenReturn(Future.successful(PowerStation(13,"windmill", 12000)))
+        when(powerStationService.createPowerStation(CreatePowerStation("windmill", 12000), userId)).thenReturn(Future.successful(PowerStation(13,"windmill", 12000, 0)))
         val result:Future[Result] = fixture.createPowerStation.apply(request)
         assert(status(result) == 200)
         assert(contentAsString(result).contains("windmill") && contentAsString(result).contains("13") && contentAsString(result).contains("12000"))

@@ -18,7 +18,7 @@ class PowerStationServiceTest extends PlaySpec with ScalaFutures {
       val userId = 15l
       val powerStationType = "ptype"
       val capacity = 12d
-      when(powerStationDao.insert(userId, powerStationType, capacity)).thenReturn(Future.successful(1))
+      when(powerStationDao.insert(userId, powerStationType, capacity, 0)).thenReturn(Future.successful(1))
       whenReady(fixture.createPowerStation(CreatePowerStation(powerStationType, capacity), userId)){ powerStation =>
         assert(powerStation.powerStationType == powerStationType)
         assert(powerStation.capacity == capacity)
