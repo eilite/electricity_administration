@@ -1,5 +1,6 @@
 package services
 
+import com.github.t3hnar.bcrypt._
 import daos.UserDao
 import models.User
 import org.mockito.Mockito.{mock, when}
@@ -8,7 +9,6 @@ import org.scalatestplus.play.PlaySpec
 import pdi.jwt.{JwtAlgorithm, JwtClaim, JwtJson}
 import play.api.Configuration
 import play.api.libs.json.Json
-import com.github.t3hnar.bcrypt._
 
 /**
   * Created by elie on 4/30/17.

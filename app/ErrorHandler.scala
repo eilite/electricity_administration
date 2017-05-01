@@ -11,7 +11,7 @@ import scala.concurrent.Future
 @Singleton
 class ErrorHandler extends HttpErrorHandler{
   override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
-    Future.successful(Status(statusCode)(Json.toJson(Map("error" -> message))))
+    Future.successful(Status(statusCode))
   }
 
   override def onServerError(request: RequestHeader, exception: Throwable): Future[Result] = {

@@ -2,7 +2,7 @@ package daos
 
 import javax.inject.{Inject, Singleton}
 
-import models.User
+import models.{PowerStation, User}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
 import slick.driver.MySQLDriver.api._
@@ -27,4 +27,5 @@ class UserDao @Inject()(val dbConfigProvider: DatabaseConfigProvider)
 
   def insert(userName: String, password: String): Future[Try[Int]] =
     db.run(sqlu"INSERT INTO users(username, pwd) VALUES (${userName}, ${password})".asTry)
+
 }
