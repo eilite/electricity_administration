@@ -3,4 +3,9 @@ POST /signup @controllers.UserController.signup
 POST /login @controllers.UserController.login
 
 #Power stations routes
-POST /powerstations/create @controllers.PowerStationController.createPowerStation
+POST /powerstations @controllers.PowerStationController.createPowerStation
+GET /powerstations  @controllers.PowerStationController.getPowerStations
+
+DELETE /powerstations/:id @controllers.PowerStationController.deletePowerStation(id: Long)
+#GET /powerstations/:id  ???
+

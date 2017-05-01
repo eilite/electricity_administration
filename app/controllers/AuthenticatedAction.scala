@@ -19,5 +19,8 @@ class AuthenticatedAction(userService: UserService)  extends ActionBuilder[Authe
       .getOrElse(Future.successful(Results.Unauthorized))
   }
 }
+object AuthenticatedAction{
+  def apply(userService: UserService): AuthenticatedAction = new AuthenticatedAction(userService)
+}
 
 class AuthenticatedRequest[A](val user: User, val request: Request[A]) extends WrappedRequest[A](request)

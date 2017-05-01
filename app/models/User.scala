@@ -1,4 +1,4 @@
 package models
 
 
-case class User(id: Int, name: String)
+case class User(id: Long, name: String)

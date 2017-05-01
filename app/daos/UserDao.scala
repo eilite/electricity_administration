@@ -13,11 +13,11 @@ import scala.util.{Failure, Success, Try}
 
 
 @Singleton
-class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
+class UserDao @Inject()(val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[JdbcProfile] {
 
   def findByUsername(userName: String): Future[Option[(User, String)]]= {
-    db.run(sql"select id, username, pwd from users where username = ${userName}".as[(Int, String, String)])
+    db.run(sql"SELECT id, username, pwd FROM users WHERE username = ${userName}".as[(Long, String, String)])
       .map {
         case results if(results.size == 1)=> Some((User(results.head._1, results.head._2), results.head._3))
         case _ => None
@@ -26,5 +26,5 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
   }
 
   def insert(userName: String, password: String): Future[Try[Int]] =
-    db.run(sqlu"insert into users(username, pwd) values (${userName}, ${password})".asTry)
+    db.run(sqlu"INSERT INTO users(username, pwd) VALUES (${userName}, ${password})".asTry)
 }
