@@ -10,7 +10,6 @@ import pdi.jwt.JwtJson._
 import play.api.Configuration
 import play.api.libs.json.Json
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Try
 
@@ -20,11 +19,6 @@ class UserService @Inject()(userDao: UserDao, configuration: Configuration) {
   private val jwtAlgorithm = JwtAlgorithm.HS256
   private val jwtExpiresIn = 24 * 60 * 60
 
-  /**
-    * Decode jwt token and extract user
-    * @param token
-    * @return
-    */
   def decodeToken(token: String): Option[User] = {
     JwtJson.decode(token, jwtSecret, Seq(jwtAlgorithm))
       .filter(_.isValid)
@@ -33,12 +27,6 @@ class UserService @Inject()(userDao: UserDao, configuration: Configuration) {
       .toOption
   }
 
-  /**
-    * Generate jwt based on user's infos
-    *
-    * @param user
-    * @return
-    */
   def generateJwtToken(user: User): String = {
     val jsonUser = Json.obj(("id", user.id), ("name", user.name))
     val claim = JwtClaim(Json.stringify(jsonUser)).issuedNow.expiresIn(jwtExpiresIn)

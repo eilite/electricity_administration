@@ -38,3 +38,25 @@ object PowerStationEvent{
       (JsPath \ "timestamp").write[Long]
   )(unlift(PowerStationEvent.unapply))
 }
+
+case class PowerStationWithEvents(id: Long,
+                                 powerStationType: String,
+                                 capacity: Double,
+                                 stock: Double,
+                                 events: Seq[PowerStationEvent])
+
+object PowerStationWithEvents{
+
+  def apply(powerStation: PowerStation,
+            events: Seq[PowerStationEvent]): PowerStationWithEvents =
+    new PowerStationWithEvents(powerStation.id, powerStation.powerStationType, powerStation.capacity, powerStation.stock, events)
+
+  val powerStationWithEventsWrite: Writes[PowerStationWithEvents] = (
+    (JsPath \ "id").write[Long] and
+    (JsPath \ "powerStationType").write[String] and
+    (JsPath \ "capacity").write[Double] and
+    (JsPath \ "stock").write[Double] and
+    (JsPath \ "events").write(Writes.seq[PowerStationEvent](PowerStationEvent.powerStationEventWrites))
+    )(unlift(PowerStationWithEvents.unapply))
+
+}

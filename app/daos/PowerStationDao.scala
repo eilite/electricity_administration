@@ -1,10 +1,9 @@
 package daos
 
-import java.sql.Timestamp
 import javax.inject.Inject
 
 import exceptions.{PowerStationNotFoundException, TooLargeAmountException}
-import models.{PowerStation, PowerStationEvent}
+import models.PowerStation
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
 import slick.driver.MySQLDriver.api._
@@ -14,7 +13,7 @@ import scala.concurrent.Future
 import scala.util.Try
 
 class PowerStationDao @Inject() (protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
-  private def getPowerStation(userId: Long, powerStationId: Long) = sql"SELECT id, capacity, stock FROM powerstations WHERE user_id = ${userId} AND id = ${powerStationId}".as[(Long, Double, Double)]
+  private def getPowerStationQuery(userId: Long, powerStationId: Long) = sql"SELECT id, capacity, stock, ptype FROM powerstations WHERE user_id = ${userId} AND id = ${powerStationId}".as[(Long, Double, Double, String)]
   private def updatePowerStation(newStock: Double, powerStationId: Long) = sqlu"UPDATE powerstations set stock = ${newStock} WHERE id = ${powerStationId}"
 
   def insert(userId: Long, powerStationType: String, capacity: Double, stock: Double): Future[Int] = {
@@ -34,7 +33,7 @@ class PowerStationDao @Inject() (protected val dbConfigProvider: DatabaseConfigP
   }
 
   /**
-    * gets powerstation and loads it if required conditions fulfilled
+    *
     * @param userId
     * @param powerStationId
     * @param amount
@@ -42,7 +41,7 @@ class PowerStationDao @Inject() (protected val dbConfigProvider: DatabaseConfigP
     */
   def loadPowerStation(userId: Long, powerStationId: Long, amount: Double): Future[Try[Double]] = {
     db.run(
-      getPowerStation(userId, powerStationId).flatMap(v => {
+      getPowerStationQuery(userId, powerStationId).flatMap(v => {
         if(v.size != 1) DBIO.failed(PowerStationNotFoundException(powerStationId))
         else {
           val currentStock = v.head._3
@@ -59,9 +58,16 @@ class PowerStationDao @Inject() (protected val dbConfigProvider: DatabaseConfigP
     )
   }
 
+  /**
+    *
+    * @param userId
+    * @param powerStationId
+    * @param amount
+    * @return the powerstation's current electricity amount
+    */
   def consumeFromPowerStation(userId: Long, powerStationId: Long, amount: Double): Future[Try[Double]] = {
     db.run(
-      getPowerStation(userId, powerStationId).flatMap(v =>{
+      getPowerStationQuery(userId, powerStationId).flatMap(v =>{
         if (v.size != 1) DBIO.failed(PowerStationNotFoundException(powerStationId))
         else {
           val currentStock = v.head._3
@@ -77,17 +83,12 @@ class PowerStationDao @Inject() (protected val dbConfigProvider: DatabaseConfigP
     )
   }
 
-  def insertPowerStationEvent(amount: Double, currentAmount: Double, timestamp: Long, powerStationId: Long): Future[Try[Int]] = {
-    val time = new Timestamp(timestamp)
-    db.run(sqlu"INSERT INTO powerstationevents(amount, ts, current_amount, power_station_id) values(${amount}, ${time}, ${currentAmount}, ${powerStationId})".asTry)
+  def getPowerStation(userId: Long, powerStationId: Long): Future[Option[PowerStation]] = {
+    db.run(this.getPowerStationQuery(userId, powerStationId))
+    .map(v => {
+      if (v.size != 1) None
+      else Some(PowerStation(powerStationId, v.head._4, v.head._2, v.head._3))
+    })
   }
-
-  def getPowerStationEvents(userId: Long, powerStationId: Long): Future[Seq[PowerStationEvent]] = {
-    db.run(sql"SELECT amount, ts FROM powerstationevents pse, powerstations ps WHERE ps.user_id = ${userId} AND ps.id = pse.power_station_id = ${powerStationId}"
-      .as[(Double, Long)]
-    )
-    .map(v => v.map(t => PowerStationEvent(t._1, t._2)))
-  }
-
 
 }

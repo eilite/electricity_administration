@@ -2,14 +2,14 @@ package services
 
 import javax.inject.Inject
 
-import daos.PowerStationDao
+import daos.{PowerStationDao, PowerStationEventsDao}
 import models.{CreatePowerStation, PowerStation, PowerStationEvent}
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
-class PowerStationService @Inject() (powerStationDao: PowerStationDao) {
+class PowerStationService @Inject() (powerStationDao: PowerStationDao, powerStationEventsDao: PowerStationEventsDao) {
 
   def createPowerStation(createPowerStation: CreatePowerStation, userId: Long): Future[PowerStation] = {
     powerStationDao.insert(userId, createPowerStation.powerStationType, createPowerStation.capacity, 0)
@@ -20,7 +20,7 @@ class PowerStationService @Inject() (powerStationDao: PowerStationDao) {
     powerStationDao.loadPowerStation(userId, powerStationId, powerStationEvent.amount)
     .flatMap {
       case Success(currentAmount: Double)=>
-        powerStationDao
+        powerStationEventsDao
           .insertPowerStationEvent(amount = powerStationEvent.amount, currentAmount = currentAmount, timestamp = powerStationEvent.timestamp, powerStationId)
       case Failure(e) => Future.successful(Failure[Int](e))
     }
@@ -30,7 +30,7 @@ class PowerStationService @Inject() (powerStationDao: PowerStationDao) {
     powerStationDao.consumeFromPowerStation(userId, powerStationId, powerStationEvent.amount)
     .flatMap {
       case Success(currentAmount: Double)=>
-        powerStationDao
+        powerStationEventsDao
           .insertPowerStationEvent(amount = - powerStationEvent.amount, currentAmount = currentAmount, timestamp = powerStationEvent.timestamp, powerStationId)
       case Failure(e) => Future.successful(Failure[Int](e))
     }
