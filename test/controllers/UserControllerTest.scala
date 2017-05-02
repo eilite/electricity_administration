@@ -23,7 +23,7 @@ class UserControllerTest extends PlaySpec with ScalaFutures{
 
 
   "signup endpoint" must {
-    "return 400 on wrong json" in {
+    "return 400 if wrong json" in {
       val jsonBody =Json.obj(("userName", "name"),("wrongField", "value"))
       val request = new FakeRequest[JsValue]("POST","/signup",FakeHeaders(Seq()), jsonBody)
       val result:Future[Result] = fixture.signup.apply(request)

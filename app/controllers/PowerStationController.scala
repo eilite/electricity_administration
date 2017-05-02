@@ -22,8 +22,8 @@ class PowerStationController @Inject() (userService: UserService, powerStationDa
       case e: JsError => Future.successful(BadRequest(JsError.toJson(e)))
     }
   }
-    def deletePowerStation(id: Long) = AuthenticatedAction(userService).async(parse.empty){ request =>
-      powerStationDao.delete(id, request.user.id)
+    def deletePowerStation(powerStationId: Long) = AuthenticatedAction(userService).async(parse.empty){ request =>
+      powerStationDao.delete(powerStationId, request.user.id)
         .map(numberOfDeletes => {
           if(numberOfDeletes == 0) NotFound
           else NoContent

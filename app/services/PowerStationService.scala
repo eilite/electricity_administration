@@ -21,7 +21,7 @@ class PowerStationService @Inject() (powerStationDao: PowerStationDao, powerStat
     .flatMap {
       case Success(currentAmount: Double)=>
         powerStationEventsDao
-          .insertPowerStationEvent(amount = powerStationEvent.amount, currentAmount = currentAmount, timestamp = powerStationEvent.timestamp, powerStationId)
+          .insertPowerStationEvent(powerStationEvent.amount, currentAmount, powerStationEvent.timestamp, powerStationId)
       case Failure(e) => Future.successful(Failure[Int](e))
     }
   }
@@ -31,7 +31,7 @@ class PowerStationService @Inject() (powerStationDao: PowerStationDao, powerStat
     .flatMap {
       case Success(currentAmount: Double)=>
         powerStationEventsDao
-          .insertPowerStationEvent(amount = - powerStationEvent.amount, currentAmount = currentAmount, timestamp = powerStationEvent.timestamp, powerStationId)
+          .insertPowerStationEvent(- powerStationEvent.amount, currentAmount, powerStationEvent.timestamp, powerStationId)
       case Failure(e) => Future.successful(Failure[Int](e))
     }
   }

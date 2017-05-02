@@ -30,25 +30,26 @@ class PowerStationControllerTest extends PlaySpec with BeforeAndAfter with Scala
 
   "deletePowerStation" must {
     "return 401 if wrong token" in {
-      val request: Request[Unit] = new FakeRequest[Unit]("DELETE","/powerstations/1", FakeHeaders(Seq(("Authorization", "wrongtoken"))), Nil)
+      val request: Request[Unit] = new FakeRequest[Unit]("DELETE", "/powerstations/1", FakeHeaders(Seq(("Authorization", "wrongtoken"))), Nil)
       when(userService.decodeToken("wrongtoken")).thenReturn(None)
-      val result:Future[Result] = fixture.deletePowerStation(1).apply(request)
+      val result: Future[Result] = fixture.deletePowerStation(1).apply(request)
       assert(status(result) == 401)
     }
     "return 404 if powerStation does not exist" in {
-      val request: Request[Unit] = new FakeRequest[Unit]("DELETE","/powerstations/1", FakeHeaders(Seq(("Authorization", token))), Nil)
+      val request: Request[Unit] = new FakeRequest[Unit]("DELETE", "/powerstations/1", FakeHeaders(Seq(("Authorization", token))), Nil)
 
       when(powerStationDao.delete(1, userId)).thenReturn(Future.successful(0))
-      val result:Future[Result] = fixture.deletePowerStation(1).apply(request)
+      val result: Future[Result] = fixture.deletePowerStation(1).apply(request)
       assert(status(result) == 404)
     }
 
     "return 200 for happy case" in {
-      val request: Request[Unit] = new FakeRequest[Unit]("DELETE","/powerstations/1", FakeHeaders(Seq(("Authorization", token))), Nil)
+      val request: Request[Unit] = new FakeRequest[Unit]("DELETE", "/powerstations/1", FakeHeaders(Seq(("Authorization", token))), Nil)
       when(powerStationDao.delete(1, userId)).thenReturn(Future.successful(1))
-      val result:Future[Result] = fixture.deletePowerStation(1).apply(request)
+      val result: Future[Result] = fixture.deletePowerStation(1).apply(request)
       assert(status(result) == 204)
     }
+  }
 
     "getPowerStations" must {
 
@@ -110,5 +111,4 @@ class PowerStationControllerTest extends PlaySpec with BeforeAndAfter with Scala
       }
 
     }
-  }
 }
