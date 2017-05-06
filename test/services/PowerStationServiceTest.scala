@@ -2,7 +2,7 @@ package services
 
 import daos.{PowerStationDao, PowerStationEventsDao}
 import exceptions.PowerStationNotFoundException
-import models.{CreatePowerStation, PowerStation, PowerStationEvent, PowerStationWithEvents}
+import models.{CreatePowerStation, PowerStation, PowerStationEvent}
 import org.mockito.Mockito
 import org.mockito.Mockito.{mock, when}
 import org.scalatest.concurrent.ScalaFutures
@@ -89,7 +89,7 @@ class PowerStationServiceTest extends PlaySpec with ScalaFutures {
     "return none if no power station" in {
       val userId = 1
       val powerStationId = 2
-      when(powerStationDao.getPowerStation(userId, powerStationId)).thenReturn(Future.successful(None))
+      when(powerStationDao.findPowerStation(userId, powerStationId)).thenReturn(Future.successful(None))
 
       whenReady(fixture.getPowerStationWithFirstEvents(userId, powerStationId)){t =>
         assert(t == None)
@@ -99,12 +99,13 @@ class PowerStationServiceTest extends PlaySpec with ScalaFutures {
       val userId = 1
       val powerStationId = 2
       val powerStation = PowerStation(2, "ptype", 12000, 3000)
-      when(powerStationDao.getPowerStation(userId, powerStationId)).thenReturn(Future.successful(Some(powerStation)))
+      when(powerStationDao.findPowerStation(userId, powerStationId)).thenReturn(Future.successful(Some(powerStation)))
       when(powerStationEventsDao.getPowerStationEventsWithCount(powerStationId, 0, 10))
         .thenReturn(Future.successful((Seq(PowerStationEvent(1234, System.currentTimeMillis())), 20)))
 
       whenReady(fixture.getPowerStationWithFirstEvents(userId, powerStationId)){t =>
        assert(t.get.events.size==1)
+        assert(t.get.events.filter(_.amount==1234).nonEmpty)
         assert(t.get.id == powerStation.id)
       }
     }

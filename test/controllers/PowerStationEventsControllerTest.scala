@@ -16,7 +16,7 @@ import services.{PowerStationService, UserService}
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-class PowerStationEventsControllerTest extends PlaySpec with ScalaFutures with BeforeAndAfter{
+class PowerStationEventsControllerTest extends PlaySpec with BeforeAndAfter{
   private val userService: UserService = mock(classOf[UserService])
   private val powerStationService=  mock(classOf[PowerStationService])
   private val powerStationDao = mock(classOf[PowerStationDao])
@@ -136,7 +136,7 @@ class PowerStationEventsControllerTest extends PlaySpec with ScalaFutures with B
     "return 404 if powerstation not found " in {
 
       val request: Request[Unit] = new FakeRequest[Unit]("POST", "/powerstations/1", FakeHeaders(Seq(("Authorization", token))), Nil)
-      when(powerStationDao.getPowerStation(userId, 1)).thenReturn(Future.successful(None))
+      when(powerStationDao.findPowerStation(userId, 1)).thenReturn(Future.successful(None))
 
       val result: Future[Result] = fixture.getPowerStationEvents(1).apply(request)
       assert(status(result) == 404)
@@ -144,7 +144,7 @@ class PowerStationEventsControllerTest extends PlaySpec with ScalaFutures with B
 
     "return powerstations" in {
       val request: Request[Unit] = new FakeRequest[Unit]("POST", "/powerstations/1", FakeHeaders(Seq(("Authorization", token))), Nil)
-      when(powerStationDao.getPowerStation(userId, 1)).thenReturn(Future.successful(Some(PowerStation(1, "powerstationtype", 13000, 1234))))
+      when(powerStationDao.findPowerStation(userId, 1)).thenReturn(Future.successful(Some(PowerStation(1, "powerstationtype", 13000, 1234))))
       when(powerStationEventsDao.getPowerStationEventsWithCount(1, 0, 10)).thenReturn(Future.successful((Seq(PowerStationEvent(1234, System.currentTimeMillis())), 20)))
 
       val result: Future[Result] = fixture.getPowerStationEvents(1).apply(request)

@@ -37,7 +37,7 @@ class PowerStationService @Inject() (powerStationDao: PowerStationDao, powerStat
   }
 
   def getPowerStationWithFirstEvents(userId: Long, powerStationId: Long): Future[Option[PowerStationWithEvents]] = {
-    powerStationDao.getPowerStation(userId, powerStationId).flatMap {
+    powerStationDao.findPowerStation(userId, powerStationId).flatMap {
       case Some(powerStation: PowerStation) => {
         powerStationEventsDao.getPowerStationEventsWithCount(powerStation.id, 0, 10)
           .map(t => Some(PowerStationWithEvents(powerStation, t._1)))

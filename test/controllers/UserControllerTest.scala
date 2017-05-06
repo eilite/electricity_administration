@@ -15,7 +15,7 @@ import services.UserService
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-class UserControllerTest extends PlaySpec with ScalaFutures{
+class UserControllerTest extends PlaySpec{
 
   private val userService = mock(classOf[UserService])
   private val userDao = mock(classOf[UserDao])

@@ -14,7 +14,7 @@ import services.{PowerStationService, UserService}
 
 import scala.concurrent.Future
 
-class PowerStationControllerTest extends PlaySpec with BeforeAndAfter with ScalaFutures{
+class PowerStationControllerTest extends PlaySpec with BeforeAndAfter {
 
   private val powerStationDao = mock(classOf[PowerStationDao])
   private val powerStationService = mock(classOf[PowerStationService])
