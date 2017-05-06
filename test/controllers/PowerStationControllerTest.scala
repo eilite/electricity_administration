@@ -1,7 +1,7 @@
 package controllers
 
 import daos.PowerStationDao
-import models.{CreatePowerStation, PowerStation, User}
+import models._
 import org.mockito.Mockito.{mock, when}
 import org.scalatest.BeforeAndAfter
 import org.scalatest.concurrent.ScalaFutures
@@ -111,4 +111,26 @@ class PowerStationControllerTest extends PlaySpec with BeforeAndAfter with Scala
       }
 
     }
+
+  "get power station " must {
+    "return 404 if powerstation not found" in {
+
+      val request: Request[Unit] = new FakeRequest[Unit]("POST","/powerstations/1", FakeHeaders(Seq(("Authorization", token))), Nil)
+
+      when(powerStationService.getPowerStationWithFirstEvents(userId, 1)).thenReturn(Future.successful(None))
+      val result = fixture.getPowerStation(1).apply(request)
+      assert(status(result)==404)
+    }
+
+    "return powerstation with first events" in {
+      val request: Request[Unit] = new FakeRequest[Unit]("POST","/powerstations/1", FakeHeaders(Seq(("Authorization", token))), Nil)
+      val powerStationEvents: Seq[PowerStationEvent] = Seq(PowerStationEvent(200, 12324245), PowerStationEvent(-300, 134234234))
+      val powerStationWithEvents: PowerStationWithEvents = PowerStationWithEvents(1, "ptype", 1200, 300, powerStationEvents)
+      when(powerStationService.getPowerStationWithFirstEvents(userId, 1)).thenReturn(Future.successful(Some(powerStationWithEvents)))
+
+      val result = fixture.getPowerStation(1).apply(request)
+      assert(status(result) == 200)
+      assert(contentAsString(result).contains("\"timestamp\":12324245") && contentAsString(result).contains("\"amount\":200"))
+    }
+  }
 }

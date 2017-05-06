@@ -7,7 +7,7 @@ import services.UserService
 
 import scala.concurrent.Future
 
-class AuthenticatedAction(userService: UserService)  extends ActionBuilder[AuthenticatedRequest]{
+class AuthenticatedAction (userService: UserService)  extends ActionBuilder[AuthenticatedRequest]{
 
   override def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[Result]): Future[Result] = {
     request.headers

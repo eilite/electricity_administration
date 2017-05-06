@@ -17,7 +17,7 @@ class UserController @Inject()(userService: UserService, userDao: UserDao) exten
 
 
   def signup = Action.async(parse.json) { request =>
-    ParseAction.parseJsonBody[UserSignup](request.body) { user =>
+    ActionUtils.parseJsonBody[UserSignup](request.body) { user =>
       userService.signupUser(user)
         .map {
           case Success(_) => NoContent
@@ -29,7 +29,7 @@ class UserController @Inject()(userService: UserService, userDao: UserDao) exten
 
   def login = Action.async(parse.json) { request =>
     val unauthorized = Unauthorized(Json.toJson(Map("message" -> "wrong username or password")))
-    ParseAction.parseJsonBody[UserSignup](request.body) { user =>
+    ActionUtils.parseJsonBody[UserSignup](request.body) { user =>
       userDao.findByUsername(user.userName)
         .map {
           case Some(tuple) =>{

@@ -2,7 +2,7 @@ package services
 
 import daos.{PowerStationDao, PowerStationEventsDao}
 import exceptions.PowerStationNotFoundException
-import models.{CreatePowerStation, PowerStationEvent}
+import models.{CreatePowerStation, PowerStation, PowerStationEvent, PowerStationWithEvents}
 import org.mockito.Mockito
 import org.mockito.Mockito.{mock, when}
 import org.scalatest.concurrent.ScalaFutures
@@ -40,7 +40,8 @@ class PowerStationServiceTest extends PlaySpec with ScalaFutures {
       when(powerStationDao.loadPowerStation(userId, powerStationId, 100)).thenReturn(Future.successful(Failure(new PowerStationNotFoundException(powerStationId))))
 
       whenReady(fixture.loadPowerStation(userId, powerStationId, powerStationEvent)){ t =>
-        assert(t.isInstanceOf[Failure[PowerStationNotFoundException]])
+        assert(t.isFailure)
+        assert(t.failed.get.isInstanceOf[PowerStationNotFoundException])
       }
     }
 
@@ -66,7 +67,8 @@ class PowerStationServiceTest extends PlaySpec with ScalaFutures {
       when(powerStationDao.consumeFromPowerStation(userId, powerStationId, 100)).thenReturn(Future.successful(Failure(new PowerStationNotFoundException(powerStationId))))
 
       whenReady(fixture.consumePowerStation(userId, powerStationId, powerStationEvent)){ t =>
-        assert(t.isInstanceOf[Failure[PowerStationNotFoundException]])
+        assert(t.isFailure)
+        assert(t.failed.get.isInstanceOf[PowerStationNotFoundException])
       }
     }
 
@@ -79,6 +81,31 @@ class PowerStationServiceTest extends PlaySpec with ScalaFutures {
       when(powerStationEventsDao.insertPowerStationEvent(-100, 340.5, powerStationEvent.timestamp, powerStationId)).thenReturn(Future.successful(Success(1)))
       whenReady(fixture.consumePowerStation(userId, powerStationId, powerStationEvent)){ _ =>
         Mockito.verify(powerStationEventsDao).insertPowerStationEvent(-100, 340.5, powerStationEvent.timestamp, powerStationId)
+      }
+    }
+  }
+
+  "get power station with first events " must {
+    "return none if no power station" in {
+      val userId = 1
+      val powerStationId = 2
+      when(powerStationDao.getPowerStation(userId, powerStationId)).thenReturn(Future.successful(None))
+
+      whenReady(fixture.getPowerStationWithFirstEvents(userId, powerStationId)){t =>
+        assert(t == None)
+      }
+    }
+    "return powerstation with events if power station found" in {
+      val userId = 1
+      val powerStationId = 2
+      val powerStation = PowerStation(2, "ptype", 12000, 3000)
+      when(powerStationDao.getPowerStation(userId, powerStationId)).thenReturn(Future.successful(Some(powerStation)))
+      when(powerStationEventsDao.getPowerStationEventsWithCount(powerStationId, 0, 10))
+        .thenReturn(Future.successful((Seq(PowerStationEvent(1234, System.currentTimeMillis())), 20)))
+
+      whenReady(fixture.getPowerStationWithFirstEvents(userId, powerStationId)){t =>
+       assert(t.get.events.size==1)
+        assert(t.get.id == powerStation.id)
       }
     }
   }

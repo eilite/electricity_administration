@@ -6,8 +6,9 @@ POST /login @controllers.UserController.login
 POST /powerstations @controllers.PowerStationController.createPowerStation
 GET /powerstations  @controllers.PowerStationController.getPowerStations
 DELETE /powerstations/:id @controllers.PowerStationController.deletePowerStation(id: Long)
+GET /powerstations/:id @controllers.PowerStationController.getPowerStation(id: Long)
 
 POST /powerstations/:id/load @controllers.PowerStationEventsController.loadPowerStation(id: Long)
 POST /powerstations/:id/consume @controllers.PowerStationEventsController.consumePowerStation(id: Long)
-GET /powerstations/:id  @controllers.PowerStationEventsController.getPowerStationEvents(id: Long)
+GET /powerstations/:id/events  @controllers.PowerStationEventsController.getPowerStationEvents(id: Long)
 

@@ -145,11 +145,12 @@ class PowerStationEventsControllerTest extends PlaySpec with ScalaFutures with B
     "return powerstations" in {
       val request: Request[Unit] = new FakeRequest[Unit]("POST", "/powerstations/1", FakeHeaders(Seq(("Authorization", token))), Nil)
       when(powerStationDao.getPowerStation(userId, 1)).thenReturn(Future.successful(Some(PowerStation(1, "powerstationtype", 13000, 1234))))
-      when(powerStationEventsDao.getPowerStationEvents(1)).thenReturn(Future.successful(Seq(PowerStationEvent(1234, System.currentTimeMillis()))))
+      when(powerStationEventsDao.getPowerStationEventsWithCount(1, 0, 10)).thenReturn(Future.successful((Seq(PowerStationEvent(1234, System.currentTimeMillis())), 20)))
 
       val result: Future[Result] = fixture.getPowerStationEvents(1).apply(request)
       assert(status(result) == 200)
-      assert(contentAsString(result).contains("1234") && contentAsString(result).contains("powerstationtype"))
+      val content = contentAsString(result)
+      assert(content.contains("1234") && content.contains("\"count\":20") && content.contains("\"limit\":10"))
     }
   }
 

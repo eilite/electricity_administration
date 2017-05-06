@@ -3,7 +3,7 @@ package services
 import javax.inject.Inject
 
 import daos.{PowerStationDao, PowerStationEventsDao}
-import models.{CreatePowerStation, PowerStation, PowerStationEvent}
+import models.{CreatePowerStation, PowerStation, PowerStationEvent, PowerStationWithEvents}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -33,6 +33,16 @@ class PowerStationService @Inject() (powerStationDao: PowerStationDao, powerStat
         powerStationEventsDao
           .insertPowerStationEvent(- powerStationEvent.amount, currentAmount, powerStationEvent.timestamp, powerStationId)
       case Failure(e) => Future.successful(Failure[Int](e))
+    }
+  }
+
+  def getPowerStationWithFirstEvents(userId: Long, powerStationId: Long): Future[Option[PowerStationWithEvents]] = {
+    powerStationDao.getPowerStation(userId, powerStationId).flatMap {
+      case Some(powerStation: PowerStation) => {
+        powerStationEventsDao.getPowerStationEventsWithCount(powerStation.id, 0, 10)
+          .map(t => Some(PowerStationWithEvents(powerStation, t._1)))
+      }
+      case None => Future.successful(None)
     }
   }
 

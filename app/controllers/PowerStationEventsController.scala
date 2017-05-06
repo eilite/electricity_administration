@@ -4,8 +4,8 @@ import javax.inject.Inject
 
 import daos.{PowerStationDao, PowerStationEventsDao}
 import exceptions.{PowerStationNotFoundException, TooLargeAmountException}
-import models.{PowerStationEvent, PowerStationWithEvents}
-import play.api.libs.json.{JsError, JsSuccess, Json}
+import models.{PowerStationEvent, PowerStationEventsPage}
+import play.api.libs.json.Json
 import play.api.mvc.Controller
 import services.{PowerStationService, UserService}
 
@@ -19,7 +19,7 @@ class PowerStationEventsController @Inject() (userService: UserService,
                                               powerStationEventsDao: PowerStationEventsDao) extends Controller {
 
   def loadPowerStation(powerStationId: Long) = AuthenticatedAction(userService).async(parse.json) { request =>
-    ParseAction.parseJsonBody[PowerStationEvent](request.body)  { powerStationEvent =>
+    ActionUtils.parseJsonBody[PowerStationEvent](request.body)  { powerStationEvent =>
     powerStationService.loadPowerStation(request.user.id, powerStationId, powerStationEvent).map {
         case Success(_) => NoContent
         case Failure(e: PowerStationNotFoundException) => NotFound(Json.toJson(Map("error" -> s"power station not found : ${e.powerStationId}")))
@@ -30,7 +30,7 @@ class PowerStationEventsController @Inject() (userService: UserService,
   }
 
   def consumePowerStation(powerStationId: Long) = AuthenticatedAction(userService).async(parse.json) { request =>
-    ParseAction.parseJsonBody[PowerStationEvent](request.body) { powerStationEvent =>
+    ActionUtils.parseJsonBody[PowerStationEvent](request.body) { powerStationEvent =>
       powerStationService.consumePowerStation(request.user.id, powerStationId, powerStationEvent).map {
         case Success(_) => NoContent
         case Failure(e: PowerStationNotFoundException) => NotFound(Json.toJson(Map("error" -> s"power station not found : ${e.powerStationId}")))
@@ -41,10 +41,12 @@ class PowerStationEventsController @Inject() (userService: UserService,
   }
 
   def getPowerStationEvents(powerStationId: Long) = AuthenticatedAction(userService).async(parse.empty) { request =>
+    val offset: Int = request.getQueryString("offset").map(_.toInt).getOrElse(0)
+    val limit: Int = request.getQueryString("limit").map(_.toInt).getOrElse(10)
     powerStationDao.getPowerStation(request.user.id, powerStationId).flatMap {
       case Some(powerStation) => {
-        powerStationEventsDao.getPowerStationEvents(powerStation.id)
-          .map(events => Ok(Json.toJson(PowerStationWithEvents(powerStation, events))))
+        powerStationEventsDao.getPowerStationEventsWithCount(powerStation.id, offset, limit)
+          .map(t => Ok(Json.toJson(PowerStationEventsPage(t._1, offset, limit, t._2))))
       }
       case None => Future.successful(NotFound)
     }

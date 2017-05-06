@@ -6,7 +6,7 @@ import play.api.mvc.Results._
 
 import scala.concurrent.Future
 
-object ParseAction{
+object ActionUtils{
   def parseJsonBody[BODY_TYPE](jsonBody: JsValue)(block: (BODY_TYPE => Future[Result]))(implicit rds: Reads[BODY_TYPE]): Future[Result] = {
     jsonBody.validate[BODY_TYPE] match {
       case s: JsSuccess[BODY_TYPE] => block(s.value)
