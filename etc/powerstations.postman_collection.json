@@ -1,0 +1,202 @@
+{
+	"variables": [],
+	"info": {
+		"name": "powerstations",
+		"_postman_id": "8bbb05b6-9bf1-d562-8891-f5c11d7d371b",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "signup",
+			"request": {
+				"url": "localhost:9000/signup",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"userName\": \"elie\",\n\t\"password\": \"1234\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "login",
+			"request": {
+				"url": "localhost:9000/login",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"userName\": \"elie\",\n\t\"password\": \"1233\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "powerstation list",
+			"request": {
+				"url": "localhost:9000/powerstations",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "create powerstation",
+			"request": {
+				"url": "localhost:9000/powerstations",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"powerStationType\": \"panneaux solaire\",\n\t\"capacity\": 3000\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "delete powerstation",
+			"request": {
+				"url": "localhost:9000/powerstations/3",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"powerStationType\": \"panneaux solaire\",\n\t\"capacity\": 3000\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "get powerstation by id",
+			"request": {
+				"url": "localhost:9002/powerstations/4",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "consume from powerstation",
+			"request": {
+				"url": "localhost:9003/powerstations/2/consume",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"amount\": 500, \n\t\"timestamp\": 1494100166000\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "load powerstation",
+			"request": {
+				"url": "localhost:9003/powerstations/2/load",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"amount\": 700, \n\t\"timestamp\": 1494101126000\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "get powerstation events by id",
+			"request": {
+				"url": "localhost:9000/powerstations/2/events",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
