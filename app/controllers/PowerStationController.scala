@@ -21,13 +21,14 @@ class PowerStationController @Inject() (userService: UserService,
         .map(powerStation => Ok(Json.toJson(powerStation)))
     }
   }
-    def deletePowerStation(powerStationId: Long) = AuthenticatedAction(userService).async(parse.empty){ request =>
-      powerStationDao.delete(powerStationId, request.user.id)
-        .map(numberOfDeletes => {
-          if(numberOfDeletes == 0) NotFound
-          else NoContent
-        })
-    }
+  
+  def deletePowerStation(powerStationId: Long) = AuthenticatedAction(userService).async(parse.empty){ request =>
+    powerStationDao.delete(powerStationId, request.user.id)
+      .map(numberOfDeletes => {
+        if(numberOfDeletes == 0) NotFound
+        else NoContent
+      })
+  }
 
   def getPowerStations = AuthenticatedAction(userService).async(parse.empty){ request =>
     powerStationDao.getPowerStations(request.user.id)

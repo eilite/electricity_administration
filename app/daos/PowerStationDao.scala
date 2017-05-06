@@ -18,7 +18,7 @@ class PowerStationDao @Inject() (protected val dbConfigProvider: DatabaseConfigP
 
   def insert(userId: Long, powerStationType: String, capacity: Double, stock: Double): Future[Int] = {
     val composedAction = for {
-      _ <- sqlu"INSERT INTO powerstations(user_id, ptype, capacity, stock) VALUES(${userId}, ${powerStationType}, ${capacity}, ${stock})"
+      _ <- sqlu"INSERT INTO powerstations(user_id, ptype, capacity, stock, created) VALUES(${userId}, ${powerStationType}, ${capacity}, ${stock}, NOW())"
       lastInsertId <- sql"SELECT LAST_INSERT_ID()".as[Int].head
     } yield lastInsertId
 
@@ -31,7 +31,7 @@ class PowerStationDao @Inject() (protected val dbConfigProvider: DatabaseConfigP
 
 
   def getPowerStations(userId: Long): Future[Seq[PowerStation]] = {
-    db.run(sql"SELECT id, ptype, capacity, stock FROM powerstations WHERE user_id = ${userId}".as[(Long, String, Double, Double)])
+    db.run(sql"SELECT id, ptype, capacity, stock FROM powerstations WHERE user_id = ${userId} ORDER BY created DESC".as[(Long, String, Double, Double)])
     .map(v => v.map(t => new PowerStation(t._1, t._2, t._3, t._4)))
   }
 
