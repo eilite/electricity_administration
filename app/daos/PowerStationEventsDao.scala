@@ -23,7 +23,7 @@ class PowerStationEventsDao  @Inject() (protected val dbConfigProvider: Database
 
   def getPowerStationEventsWithCount(powerStationId: Long, offset: Int, limit: Int): Future[(Seq[PowerStationEvent], Int)] = {
     val composedAction = for {
-      powerStations <- sql"SELECT amount, UNIX_TIMESTAMP(ts) FROM powerstationevents WHERE power_station_id = ${powerStationId} ORDER BY ts DESC LIMIT ${offset}, ${limit}"
+      powerStations <- sql"SELECT amount, UNIX_TIMESTAMP(ts)*1000 FROM powerstationevents WHERE power_station_id = ${powerStationId} ORDER BY ts DESC LIMIT ${offset}, ${limit}"
         .as[(Double, Long)]
       totalCount <- sql"SELECT COUNT(*) FROM powerstationevents WHERE power_station_id = ${powerStationId}".as[Int].head
     } yield (powerStations, totalCount)
