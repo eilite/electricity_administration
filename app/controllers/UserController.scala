@@ -10,7 +10,6 @@ import play.api.mvc.{Action, Controller}
 import services.UserService
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 class UserController @Inject()(userService: UserService, userDao: UserDao) extends Controller {
@@ -18,34 +17,28 @@ class UserController @Inject()(userService: UserService, userDao: UserDao) exten
 
 
   def signup = Action.async(parse.json) { request =>
-    request.body.validate[UserSignup](UserSignup.userSignupReads) match {
-      case s: JsSuccess[UserSignup]=> {
-        userService.signupUser(s.value)
-          .map {
-            case Success(_) => NoContent
-            case Failure(e: MySQLIntegrityConstraintViolationException) if(e.getErrorCode == duplicateEntryMySQLCode) =>
-              BadRequest(Json.toJson(Map("error" -> "username already taken")))
-          }
-      }
-      case e: JsError => Future(BadRequest(JsError.toJson(e)))
+    ParseAction.parseJsonBody[UserSignup](request.body) { user =>
+      userService.signupUser(user)
+        .map {
+          case Success(_) => NoContent
+          case Failure(e: MySQLIntegrityConstraintViolationException) if(e.getErrorCode == duplicateEntryMySQLCode) =>
+            BadRequest(Json.toJson(Map("error" -> "username already taken")))
+        }
     }
   }
 
   def login = Action.async(parse.json) { request =>
     val unauthorized = Unauthorized(Json.toJson(Map("message" -> "wrong username or password")))
-    request.body.validate[UserSignup](UserSignup.userSignupReads) match {
-      case s: JsSuccess[UserSignup] => {
-        userDao.findByUsername(s.value.userName)
-          .map {
-            case Some(tuple) =>{
-              val correctPwd = userService.validatePassword(s.value.password, tuple._2)
-              if (correctPwd) Ok(Json.toJson(Map("token"-> userService.generateJwtToken(tuple._1))))
-              else unauthorized
-            }
-            case None => unauthorized
+    ParseAction.parseJsonBody[UserSignup](request.body) { user =>
+      userDao.findByUsername(user.userName)
+        .map {
+          case Some(tuple) =>{
+            val correctPwd = userService.validatePassword(user.password, tuple._2)
+            if (correctPwd) Ok(Json.toJson(Map("token"-> userService.generateJwtToken(tuple._1))))
+            else unauthorized
           }
-      }
-      case e:JsError => Future(BadRequest(JsError.toJson(e)))
+          case None => unauthorized
+        }
     }
   }
 }

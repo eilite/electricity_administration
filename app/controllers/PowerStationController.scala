@@ -9,17 +9,13 @@ import play.api.mvc.Controller
 import services.{PowerStationService, UserService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 class PowerStationController @Inject() (userService: UserService, powerStationDao: PowerStationDao, powerStationService: PowerStationService) extends Controller{
 
   def createPowerStation = AuthenticatedAction(userService).async(parse.json) { request =>
-    request.body.validate[CreatePowerStation](CreatePowerStation.createPowerStationReads) match {
-      case s: JsSuccess[CreatePowerStation] => {
-        powerStationService.createPowerStation(s.value, request.user.id)
-          .map(powerStation => Ok(Json.toJson(powerStation)(PowerStation.powerStationWrites)))
-      }
-      case e: JsError => Future.successful(BadRequest(JsError.toJson(e)))
+    ParseAction.parseJsonBody[CreatePowerStation](request.body) { powerStation =>
+      powerStationService.createPowerStation(powerStation, request.user.id)
+        .map(powerStation => Ok(Json.toJson(powerStation)(PowerStation.powerStationWrites)))
     }
   }
     def deletePowerStation(powerStationId: Long) = AuthenticatedAction(userService).async(parse.empty){ request =>

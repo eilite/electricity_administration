@@ -8,7 +8,7 @@ case class User(id: Long, name: String)
 case class UserSignup(userName: String, password: String)
 
 object UserSignup{
-  val userSignupReads: Reads[UserSignup]=(
+  implicit val userSignupReads: Reads[UserSignup]=(
     (JsPath \ "userName").read[String](Reads.minLength[String](3)) and
       (JsPath \ "password").read[String](Reads.minLength[String](3))
     )(UserSignup.apply _)
