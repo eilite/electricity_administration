@@ -197,6 +197,31 @@
 				"description": ""
 			},
 			"response": []
+		},
+		{
+			"name": "update powerstation",
+			"request": {
+				"url": "localhost:9000/powerstations/4",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"powerStationType\": \"wind-mill\",\n\t\"capacity\": 12000\n}"
+				},
+				"description": ""
+			},
+			"response": []
 		}
 	]
 }

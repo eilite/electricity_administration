@@ -4,12 +4,14 @@ package controllers
 import javax.inject.Inject
 
 import daos.PowerStationDao
-import models.{CreatePowerStation, PowerStationWithEvents}
+import exceptions.PowerStationNotFoundException
+import models.{CreatePowerStation, PowerStation, PowerStationWithEvents}
 import play.api.libs.json._
 import play.api.mvc.Controller
 import services.{PowerStationService, UserService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.{Failure, Success}
 
 class PowerStationController @Inject() (userService: UserService,
                                         powerStationDao: PowerStationDao,
@@ -30,9 +32,14 @@ class PowerStationController @Inject() (userService: UserService,
       })
   }
 
-  def getPowerStations = AuthenticatedAction(userService).async(parse.empty){ request =>
-    powerStationDao.getPowerStations(request.user.id)
-      .map(powerStations => Ok(Json.toJson(powerStations)))
+  def updatePowerStation(powerStationId: Long) = AuthenticatedAction(userService).async(parse.json){ request =>
+   ActionUtils.parseJsonBody[CreatePowerStation](request.body) { powerStation =>
+     powerStationDao.update(request.user.id, powerStationId, powerStation.powerStationType, powerStation.capacity)
+      .map{
+        case Success(powerStation: PowerStation) => Ok(Json.toJson(powerStation))
+        case Failure(e: PowerStationNotFoundException) => NotFound(Json.toJson(Map("error" -> s"power station not found : ${e.powerStationId}")))
+      }
+   }
   }
 
   def getPowerStation(id: Long) = AuthenticatedAction(userService).async(parse.empty){request =>
@@ -41,4 +48,10 @@ class PowerStationController @Inject() (userService: UserService,
       case None => NotFound
     }
   }
+
+  def getPowerStations = AuthenticatedAction(userService).async(parse.empty){ request =>
+    powerStationDao.getPowerStations(request.user.id)
+      .map(powerStations => Ok(Json.toJson(powerStations)))
+  }
+
 }

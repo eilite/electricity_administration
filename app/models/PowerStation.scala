@@ -20,7 +20,7 @@ case class CreatePowerStation(powerStationType: String, capacity: Double)
 
 object CreatePowerStation{
   implicit val createPowerStationReads: Reads[CreatePowerStation] =(
-      (__ \ "powerStationType").read[String](Reads.minLength[String](3)) and
-      (__ \ "capacity").read[Double](Reads.min[Double](0))
+      (JsPath \ "powerStationType").read[String](Reads.minLength[String](3)) and
+      (JsPath \ "capacity").read[Double](Reads.min[Double](0))
     )(CreatePowerStation.apply _)
 }

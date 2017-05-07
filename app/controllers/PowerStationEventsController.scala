@@ -20,7 +20,7 @@ class PowerStationEventsController @Inject() (userService: UserService,
 
   def loadPowerStation(powerStationId: Long) = AuthenticatedAction(userService).async(parse.json) { request =>
     ActionUtils.parseJsonBody[PowerStationEvent](request.body)  { powerStationEvent =>
-    powerStationService.loadPowerStation(request.user.id, powerStationId, powerStationEvent).map {
+    powerStationDao.loadPowerStation(request.user.id, powerStationId, powerStationEvent.amount, powerStationEvent.timestamp).map {
         case Success(_) => NoContent
         case Failure(e: PowerStationNotFoundException) => NotFound(Json.toJson(Map("error" -> s"power station not found : ${e.powerStationId}")))
         case Failure(_: TooLargeAmountException) => BadRequest(Json.toJson(Map("error" -> "amount too large")))
@@ -31,7 +31,7 @@ class PowerStationEventsController @Inject() (userService: UserService,
 
   def consumePowerStation(powerStationId: Long) = AuthenticatedAction(userService).async(parse.json) { request =>
     ActionUtils.parseJsonBody[PowerStationEvent](request.body) { powerStationEvent =>
-      powerStationService.consumePowerStation(request.user.id, powerStationId, powerStationEvent).map {
+      powerStationDao.consumeFromPowerStation(request.user.id, powerStationId, powerStationEvent.amount, powerStationEvent.timestamp).map {
         case Success(_) => NoContent
         case Failure(e: PowerStationNotFoundException) => NotFound(Json.toJson(Map("error" -> s"power station not found : ${e.powerStationId}")))
         case Failure(_: TooLargeAmountException) => BadRequest(Json.toJson(Map("error" -> "amount too large")))
