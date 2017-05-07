@@ -52,7 +52,7 @@ class PowerStationEventsControllerTest extends PlaySpec with BeforeAndAfter{
       val jsonBody = Json.obj(("amount", 200),("timestamp", time))
       val request: Request[JsValue] = new FakeRequest[JsValue]("POST", "/powerstations/1/load", FakeHeaders(Seq(("Authorization", token))), jsonBody)
 
-      when(powerStationService.loadPowerStation(userId, 1, PowerStationEvent(200, time))).thenReturn(Future.successful(Failure(new PowerStationNotFoundException(1))))
+      when(powerStationDao.loadPowerStation(userId, 1,200, time)).thenReturn(Future.successful(Failure(new PowerStationNotFoundException(1))))
 
       val result: Future[Result] = fixture.loadPowerStation(1).apply(request)
       assert(status(result) == 404)
@@ -63,7 +63,7 @@ class PowerStationEventsControllerTest extends PlaySpec with BeforeAndAfter{
       val jsonBody = Json.obj(("amount", 200),("timestamp", time))
       val request: Request[JsValue] = new FakeRequest[JsValue]("POST", "/powerstations/1/load", FakeHeaders(Seq(("Authorization", token))), jsonBody)
 
-      when(powerStationService.loadPowerStation(userId, 1, PowerStationEvent(200, time))).thenReturn(Future.successful(Failure(new TooLargeAmountException)))
+      when(powerStationDao.loadPowerStation(userId, 1, 200, time)).thenReturn(Future.successful(Failure(new TooLargeAmountException)))
 
       val result: Future[Result] = fixture.loadPowerStation(1).apply(request)
       assert(status(result) == 400)
@@ -74,7 +74,7 @@ class PowerStationEventsControllerTest extends PlaySpec with BeforeAndAfter{
       val jsonBody = Json.obj(("amount", 200),("timestamp", time))
       val request: Request[JsValue] = new FakeRequest[JsValue]("POST", "/powerstations/1/load", FakeHeaders(Seq(("Authorization", token))), jsonBody)
 
-      when(powerStationService.loadPowerStation(userId, 1, PowerStationEvent(200, time))).thenReturn(Future.successful(Success(1)))
+      when(powerStationDao.loadPowerStation(userId, 1, 200, time)).thenReturn(Future.successful(Success(1)))
 
       val result: Future[Result] = fixture.loadPowerStation(1).apply(request)
       assert(status(result) == 204)
@@ -103,7 +103,7 @@ class PowerStationEventsControllerTest extends PlaySpec with BeforeAndAfter{
       val jsonBody = Json.obj(("amount", 200),("timestamp", time))
       val request: Request[JsValue] = new FakeRequest[JsValue]("POST", "/powerstations/1/load", FakeHeaders(Seq(("Authorization", token))), jsonBody)
 
-      when(powerStationService.consumePowerStation(userId, 1, PowerStationEvent(200, time))).thenReturn(Future.successful(Failure(new PowerStationNotFoundException(1))))
+      when(powerStationDao.consumeFromPowerStation(userId, 1, 200, time)).thenReturn(Future.successful(Failure(new PowerStationNotFoundException(1))))
 
       val result: Future[Result] = fixture.consumePowerStation(1).apply(request)
       assert(status(result) == 404)
@@ -114,7 +114,7 @@ class PowerStationEventsControllerTest extends PlaySpec with BeforeAndAfter{
       val jsonBody = Json.obj(("amount", 200),("timestamp", time))
       val request: Request[JsValue] = new FakeRequest[JsValue]("POST", "/powerstations/1/load", FakeHeaders(Seq(("Authorization", token))), jsonBody)
 
-      when(powerStationService.consumePowerStation(userId, 1, PowerStationEvent(200, time))).thenReturn(Future.successful(Failure(new TooLargeAmountException)))
+      when(powerStationDao.consumeFromPowerStation(userId, 1, 200, time)).thenReturn(Future.successful(Failure(new TooLargeAmountException)))
 
       val result: Future[Result] = fixture.consumePowerStation(1).apply(request)
       assert(status(result) == 400)
@@ -125,7 +125,7 @@ class PowerStationEventsControllerTest extends PlaySpec with BeforeAndAfter{
       val jsonBody = Json.obj(("amount", 200),("timestamp", time))
       val request: Request[JsValue] = new FakeRequest[JsValue]("POST", "/powerstations/1/load", FakeHeaders(Seq(("Authorization", token))), jsonBody)
 
-      when(powerStationService.consumePowerStation(userId, 1, PowerStationEvent(200, time))).thenReturn(Future.successful(Success(1)))
+      when(powerStationDao.consumeFromPowerStation(userId, 1, 200, time)).thenReturn(Future.successful(Success(1)))
 
       val result: Future[Result] = fixture.consumePowerStation(1).apply(request)
       assert(status(result) == 204)

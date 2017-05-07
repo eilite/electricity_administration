@@ -1,10 +1,10 @@
 package controllers
 
 import daos.PowerStationDao
+import exceptions.PowerStationNotFoundException
 import models._
 import org.mockito.Mockito.{mock, when}
 import org.scalatest.BeforeAndAfter
-import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Request, Result}
@@ -13,6 +13,7 @@ import play.api.test.{FakeHeaders, FakeRequest}
 import services.{PowerStationService, UserService}
 
 import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 class PowerStationControllerTest extends PlaySpec with BeforeAndAfter {
 
@@ -131,6 +132,32 @@ class PowerStationControllerTest extends PlaySpec with BeforeAndAfter {
       val result = fixture.getPowerStation(1).apply(request)
       assert(status(result) == 200)
       assert(contentAsString(result).contains("\"timestamp\":12324245") && contentAsString(result).contains("\"amount\":200"))
+    }
+  }
+
+  "update power station" must {
+    "return 404 if powerstation not found" in {
+      val jsonBody =Json.obj(("powerStationType", "wind-mill"),("capacity", 1200))
+      val request: Request[JsValue] = new FakeRequest[JsValue]("PUT","/powerstations/1", FakeHeaders(Seq(("Authorization", token))), jsonBody)
+
+      when(powerStationDao.update(userId, 1, "wind-mill", 1200)).thenReturn(Future.successful(Failure(new PowerStationNotFoundException(1))))
+
+      val result = fixture.updatePowerStation(1).apply(request)
+      assert(status(result) == 404)
+
+    }
+
+    "return 200 and powerstation for happy case" in {
+      val jsonBody =Json.obj(("powerStationType", "wind-mill"),("capacity", 1200))
+      val request: Request[JsValue] = new FakeRequest[JsValue]("PUT","/powerstations/1", FakeHeaders(Seq(("Authorization", token))), jsonBody)
+
+      when(powerStationDao.update(userId, 1, "wind-mill", 1200)).thenReturn(Future.successful(Success(PowerStation(1, "wind-mill", 1200, 400))))
+
+      val result = fixture.updatePowerStation(1).apply(request)
+
+      assert(status(result)==200)
+      val content = contentAsString(result)
+      assert(content.contains("\"powerStationType\":\"wind-mill\"") && content.contains("\"id\":1"))
     }
   }
 }
