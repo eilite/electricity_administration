@@ -40,9 +40,9 @@ class PowerStationEventsController @Inject() (userService: UserService,
     }
   }
 
-  def getPowerStationEvents(powerStationId: Long) = AuthenticatedAction(userService).async(parse.empty) { request =>
-    val offset: Int = request.getQueryString("offset").map(_.toInt).getOrElse(0)
-    val limit: Int = request.getQueryString("limit").map(_.toInt).getOrElse(10)
+  def getPowerStationEvents(powerStationId: Long, offsetOpt: Option[Int], limitOpt: Option[Int]) = AuthenticatedAction(userService).async(parse.empty) { request =>
+    val offset: Int = offsetOpt.getOrElse(0)
+    val limit: Int = limitOpt.getOrElse(10)
     powerStationDao.findPowerStation(request.user.id, powerStationId).flatMap {
       case Some(powerStation) => {
         powerStationEventsDao.getPowerStationEventsWithCount(powerStation.id, offset, limit)
