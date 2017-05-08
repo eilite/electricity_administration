@@ -12,7 +12,7 @@ class PowerStationServiceTest extends PlaySpec with ScalaFutures {
 
   private val powerStationDao = mock(classOf[PowerStationDao])
   private val powerStationEventsDao = mock(classOf[PowerStationEventsDao])
-  private val fixture = new PowerStationService(powerStationDao, powerStationEventsDao)
+  private val fixture = new DefaultPowerStationService(powerStationDao, powerStationEventsDao)
 
   "createPowerStation " must {
     "return the created powerstation " in {

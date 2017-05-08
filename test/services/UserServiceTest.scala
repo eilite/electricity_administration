@@ -1,7 +1,7 @@
 package services
 
 import com.github.t3hnar.bcrypt._
-import daos.UserDao
+import daos.{DefaultUserDao, UserDao}
 import models.User
 import org.mockito.Mockito.{mock, when}
 import org.scalatest.BeforeAndAfter
@@ -26,7 +26,7 @@ class UserServiceTest extends PlaySpec with BeforeAndAfter{
     when(underlyingConfig.getString("bcryptsalt")).thenReturn("$2a$10$swCLHN1hBY1.N7.vr.uupe")
   })
 
-  def fixture = new UserService(userDao, config)
+  def fixture = new DefaultUserService(userDao, config)
   "decodeToken" must {
     "return none if token expired" in {
       val claim = JwtClaim(Json.stringify(Json.obj(("id", 1)))).expiresIn(-1)

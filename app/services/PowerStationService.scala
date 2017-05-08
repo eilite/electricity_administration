@@ -1,28 +1,12 @@
 package services
 
-import javax.inject.Inject
-
-import daos.{PowerStationDao, PowerStationEventsDao}
+import com.google.inject.ImplementedBy
 import models.{CreatePowerStation, PowerStation, PowerStationWithEvents}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+@ImplementedBy(classOf[DefaultPowerStationService])
+trait PowerStationService {
+  def createPowerStation(createPowerStation: CreatePowerStation, userId: Long): Future[PowerStation]
 
-class PowerStationService @Inject() (powerStationDao: PowerStationDao, powerStationEventsDao: PowerStationEventsDao) {
-
-  def createPowerStation(createPowerStation: CreatePowerStation, userId: Long): Future[PowerStation] = {
-    powerStationDao.insert(userId, createPowerStation.powerStationType, createPowerStation.capacity, 0)
-      .map(powerStationId =>PowerStation(powerStationId, createPowerStation.powerStationType, createPowerStation.capacity, 0))
-  }
-
-  def getPowerStationWithFirstEvents(userId: Long, powerStationId: Long): Future[Option[PowerStationWithEvents]] = {
-    powerStationDao.findPowerStation(userId, powerStationId).flatMap {
-      case Some(powerStation: PowerStation) => {
-        powerStationEventsDao.getPowerStationEventsWithCount(powerStation.id, 0, 10)
-          .map(t => Some(PowerStationWithEvents(powerStation, t._1)))
-      }
-      case None => Future.successful(None)
-    }
-  }
-
+  def getPowerStationWithFirstEvents(userId: Long, powerStationId: Long): Future[Option[PowerStationWithEvents]]
 }

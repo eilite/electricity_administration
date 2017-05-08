@@ -5,7 +5,6 @@ import exceptions.{PowerStationNotFoundException, TooLargeAmountException}
 import models.{PowerStation, PowerStationEvent, User}
 import org.mockito.Mockito.{mock, when}
 import org.scalatest.BeforeAndAfter
-import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Request, Result}
@@ -17,7 +16,7 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 class PowerStationEventsControllerTest extends PlaySpec with BeforeAndAfter{
-  private val userService: UserService = mock(classOf[UserService])
+  private val userService = mock(classOf[UserService])
   private val powerStationService=  mock(classOf[PowerStationService])
   private val powerStationDao = mock(classOf[PowerStationDao])
   private val powerStationEventsDao = mock(classOf[PowerStationEventsDao])

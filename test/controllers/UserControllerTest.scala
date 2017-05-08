@@ -4,7 +4,6 @@ import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationExceptio
 import daos.UserDao
 import models.{User, UserSignup}
 import org.mockito.Mockito.{mock, when}
-import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
