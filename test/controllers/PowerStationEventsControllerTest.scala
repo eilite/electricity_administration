@@ -137,7 +137,7 @@ class PowerStationEventsControllerTest extends PlaySpec with BeforeAndAfter{
       val request: Request[Unit] = new FakeRequest[Unit]("POST", "/powerstations/1", FakeHeaders(Seq(("Authorization", token))), Nil)
       when(powerStationDao.findPowerStation(userId, 1)).thenReturn(Future.successful(None))
 
-      val result: Future[Result] = fixture.getPowerStationEvents(1).apply(request)
+      val result: Future[Result] = fixture.getPowerStationEvents(1, None, None).apply(request)
       assert(status(result) == 404)
     }
 
@@ -146,7 +146,7 @@ class PowerStationEventsControllerTest extends PlaySpec with BeforeAndAfter{
       when(powerStationDao.findPowerStation(userId, 1)).thenReturn(Future.successful(Some(PowerStation(1, "powerstationtype", 13000, 1234))))
       when(powerStationEventsDao.getPowerStationEventsWithCount(1, 0, 10)).thenReturn(Future.successful((Seq(PowerStationEvent(1234, System.currentTimeMillis())), 20)))
 
-      val result: Future[Result] = fixture.getPowerStationEvents(1).apply(request)
+      val result: Future[Result] = fixture.getPowerStationEvents(1,None, None).apply(request)
       assert(status(result) == 200)
       val content = contentAsString(result)
       assert(content.contains("1234") && content.contains("\"count\":20") && content.contains("\"limit\":10"))
